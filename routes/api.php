@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Clients\ClientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+//Rutas para las operaciones de "Clientes"
+Route::post('clients', [ClientController::class, 'createClient']);
+Route::get('clients', [ClientController::class, 'getClients']);
+Route::get('client/{telefono}', [ClientController::class, 'getClient']);
+Route::put('client/{telefono}', [ClientController::class, 'editClient']);
+Route::delete('client/{telefono}', [ClientController::class, 'deleteClient']);

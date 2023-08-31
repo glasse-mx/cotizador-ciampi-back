@@ -16,7 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('id_user'); // clave foranea del vendedor
             $table->unsignedBigInteger('id_client'); // Clave foranea del cliente
             $table->json('productos');
+            $table->unsignedBigInteger('folio_status_id');
+            $table->unsignedBigInteger('approval_status_id');
             $table->timestamps();
+
+            $table->foreign('folio_status_id')->references('id')->on('folio_status');
+            $table->foreign('approval_status_id')->references('id')->on('approval_status');
         });
     }
 

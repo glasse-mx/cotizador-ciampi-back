@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique()->nullable();
             $table->string('phone')->unique();
-            $table->string('address_street');
-            $table->string('address_ext');
-            $table->string('address_int');
-            $table->string('address_col');
-            $table->string('address_town');
-            $table->string('address_state');
-            $table->string('address_zip');
+            $table->string('address_street')->nullable();
+            $table->string('address_ext')->nullable();
+            $table->string('address_int')->nullable();
+            $table->string('address_col')->nullable();
+            $table->string('address_town')->nullable();
+            $table->string('address_state')->nullable();
+            $table->string('address_zip')->nullable();
             $table->timestamps();
         });
     }

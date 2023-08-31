@@ -19,8 +19,11 @@ return new class extends Migration
             $table->string('password');
             $table->string('avatar')->nullable();
             $table->string('signature')->nullable();
+            $table->unsignedBigInteger('user_type');
             $table->rememberToken();
             $table->timestamps();
+
+            $table->foreign('user_type')->references('id')->on('user_type');
         });
     }
 

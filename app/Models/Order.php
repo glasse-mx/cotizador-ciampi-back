@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+
+    public function folioStatus()
+    {
+        return $this->belongsTo(FolioStatus::class);
+    }
 }
