@@ -12,16 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('folio_status', function (Blueprint $table) {
+        Schema::create('delivery_status', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('value');
         });
 
-        DB::table('folio_status')->insert([
-            ['name' => 'cotizacion'],
-            ['name' => 'nota_creada'],
-            ['name' => 'nota_aprobada'],
-            ['name' => 'nota_cancelada']
+        DB::table('delivery_status')->insert([
+            ['value' => 'Por Despachar'],
+            ['value' => 'Salido de almacen'],
+            ['value' => 'Entregado']
         ]);
     }
 
@@ -30,5 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('delivery_status');
     }
 };

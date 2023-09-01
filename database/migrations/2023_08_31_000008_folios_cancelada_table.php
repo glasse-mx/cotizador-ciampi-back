@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,17 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('folio_status', function (Blueprint $table) {
+        Schema::create('folios_notas_canceladas', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->timestamps();
         });
-
-        DB::table('folio_status')->insert([
-            ['name' => 'cotizacion'],
-            ['name' => 'nota_creada'],
-            ['name' => 'nota_aprobada'],
-            ['name' => 'nota_cancelada']
-        ]);
     }
 
     /**
@@ -30,5 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('folios_notas_canceladas');
     }
 };
