@@ -9,8 +9,8 @@ class Order extends Model
 {
     use HasFactory;
 
-    public function folioStatus()
+    public function folioCotizaciones()
     {
-        return $this->belongsTo(FolioStatus::class);
+        return $this->hasOne(FolioCotizacion::class, 'folio_cotizacion_id');
     }
 }

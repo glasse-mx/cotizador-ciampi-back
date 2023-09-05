@@ -12,16 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('folio_status', function (Blueprint $table) {
+        Schema::create('banks', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('bank');
         });
 
-        DB::table('folio_status')->insert([
-            ['name' => 'cotizacion'],
-            ['name' => 'nota_creada'],
-            ['name' => 'nota_aprobada'],
-            ['name' => 'nota_cancelada']
+        DB::table('banks')->insert([
+            ['bank' => 'Banorte'],
+            ['bank' => 'BBVA'],
+            ['bank' => 'Santander'],
+            ['bank' => 'Scotiabank']
         ]);
     }
 
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('folio_status');
+        Schema::dropIfExists('banks');
     }
 };

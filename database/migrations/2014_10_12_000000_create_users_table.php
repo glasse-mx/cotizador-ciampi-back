@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -23,8 +24,17 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('user_type')->references('id')->on('user_type');
+            // $table->foreign('user_type')->references('id')->on('user_type');
         });
+
+        DB::table('users')->insert([
+            'name' => 'Ciampi Website',
+            'email' => 'sales@ciampi.com.mx',
+            'phone' => '5555555555',
+            'password' => bcrypt('12345678'),
+            'user_type' => 1,
+            'avatar' => 'default.png',
+        ]);
     }
 
     /**

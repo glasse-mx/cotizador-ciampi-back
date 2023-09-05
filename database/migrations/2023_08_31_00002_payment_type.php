@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,6 +16,20 @@ return new class extends Migration
             $table->id();
             $table->string('value');
         });
+
+        DB::table('payment_type')->insert([
+            ['value' => 'Efectivo: CDMX Sin referencia'],
+            ['value' => 'Depósito en Efectivo'],
+            ['value' => 'Cheque Nominativo'],
+            ['value' => 'Transferencia Bancaria'],
+            ['value' => 'Tarjeta de Crédito'],
+            ['value' => 'Tarjeta de Débito'],
+            ['value' => 'Liga de pago c/tarjeta'],
+            ['value' => 'Pago Web'],
+            ['value' => 'Paypal'],
+            ['value' => 'OpenPay'],
+            ['value' => 'Stripe']
+        ]);
     }
 
     /**

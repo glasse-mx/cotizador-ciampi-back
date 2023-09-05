@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Clients;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -42,7 +43,7 @@ class ClientController extends Controller
             $client->save();
 
             return response()->json([
-                "Message" => "Usuario Agregado con exito!"
+                "Message" => "Cliente Agregado con exito!"
             ]);
         } catch (ValidationException $e) {
             return response()->json([
