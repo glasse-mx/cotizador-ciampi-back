@@ -11,6 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class ClientController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => []]);
+    }
+
+
     /**
      * This Function Register a Client into the database
      */

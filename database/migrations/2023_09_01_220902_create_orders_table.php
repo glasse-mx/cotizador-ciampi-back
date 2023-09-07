@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('descuentos')->nullable();
             $table->unsignedBigInteger('folio_status_id'); // tipo de Folio => cotizacion, nota de venta o cancelada
             $table->unsignedBigInteger('approval_status_id')->nullable(); // Tipo de firma 
-            $table->unsignedBigInteger('folio_cotizacion_id'); // Generado antes de proceder a guardar la orden
+            $table->unsignedBigInteger('folio_cotizacion_id')->nullable(); // Generado antes de proceder a guardar la orden
             $table->unsignedBigInteger('folio_nota_venta_id')->nullable();
             $table->unsignedBigInteger('folio_nota_cancelada_id')->nullable();
             $table->unsignedBigInteger('delivery_status_id')->nullable();  // Estado de almacen (por despachar o entregado)

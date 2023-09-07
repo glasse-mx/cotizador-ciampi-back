@@ -18,13 +18,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-//Rutas para la gestion de Usuarios de la app
-// Route::post('register', [AuthController::class, 'register']);
-// Route::post('login', [AuthController::class, 'login']);
 
 // Rutas para la gestion de Usuarios de la app
 Route::middleware('auth:api')->get('/user', function (Request $request) {
@@ -40,24 +33,26 @@ Route::group([
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::get('profile', [AuthController::class, 'me']);
+
+    //Rutas para las operaciones de "Clientes"
+    Route::post('clients', [ClientController::class, 'createClient']);
+    Route::get('clients', [ClientController::class, 'getClients']);
+    Route::get('client/{telefono}', [ClientController::class, 'getClient']);
+    Route::put('client/{telefono}', [ClientController::class, 'editClient']);
+    Route::delete('client/{telefono}', [ClientController::class, 'deleteClient']);
+
+    //Rutas para las operaciones sobre las ordenes
+    Route::post('orders', [OrderController::class, 'createOrder']);
+    Route::put('orders/{id}', [OrderController::class, 'convertToNotaVenta']);
+    Route::put('orders/{id}/cancel', [OrderController::class, 'convertToNotaVenta']);
 });
 
-
-//Rutas para las operaciones de "Clientes"
-Route::post('clients', [ClientController::class, 'createClient']);
-Route::get('clients', [ClientController::class, 'getClients']);
-Route::get('client/{telefono}', [ClientController::class, 'getClient']);
-Route::put('client/{telefono}', [ClientController::class, 'editClient']);
-Route::delete('client/{telefono}', [ClientController::class, 'deleteClient']);
 
 // Ruta para los avatar de los usuarios
 Route::get('avatar/{filename}', [AuthController::class, 'getAvatar']);
 
 
-//Rutas para las operaciones sobre las ordenes
-Route::post('orders/folio/cotizacion', [FoliosController::class, 'createFolioCotizacion']);
-Route::post('orders/folio/venta', [FoliosController::class, 'createFolioNotaVenta']);
-Route::post('orders/folio/cancelar', [FoliosController::class, 'createFolioNotaCancelada']);
-
-
-Route::post('orders', [OrderController::class, 'createOrder']);
+// //Rutas para las operaciones sobre las ordenes
+// Route::post('orders', [OrderController::class, 'createOrder']);
+// Route::put('orders/{id}', [OrderController::class, 'convertToNotaVenta']);
+// Route::put('orders/{id}/cancel', [OrderController::class, 'convertToNotaVenta']);
