@@ -7,6 +7,9 @@ use App\Models\FolioCotizaciones;
 use App\Models\FolioNotaCancelada;
 use App\Models\FolioNotaVenta;
 use App\Models\Order;
+use App\Models\Client;
+use App\Models\FolioType;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -152,6 +155,64 @@ class OrderController extends Controller
      * Devuelve todas las cotizaciones
      */
     public function getOrders()
+    {
+        $orders = Order::where('folio_status_id', 1)->get();
+        $clients = Client::all();
+        $users = User::all();
+        $folioTypes = FolioType::all();
+        $orders->map(function ($order) use ($clients, $users, $folioTypes) {
+            $clients->map(function ($client) use ($order) {
+                if ($order->id_client == $client->id) {
+                    $order->id_client = $client->first_name . ' ' . $client->last_name;
+                }
+            });
+            $users->map(function ($user) use ($order) {
+                if ($order->id_user == $user->id) {
+                    $order->id_user = $user->name;
+                }
+            });
+            $folioTypes->map(function ($folioType) use ($order) {
+                if ($order->folio_status_id == $folioType->id) {
+                    $order->folio_status_id = $folioType->name;
+                }
+            });
+        });
+        return response()->json($orders, 200);
+    }
+
+    /**
+     * Devuelve todas las Notas de Venta
+     */
+    public function getSales()
+    {
+        $orders = Order::where('folio_status_id', 2)->get();
+        $clients = Client::all();
+        $users = User::all();
+        $folioTypes = FolioType::all();
+        $orders->map(function ($order) use ($clients, $users, $folioTypes) {
+            $clients->map(function ($client) use ($order) {
+                if ($order->id_client == $client->id) {
+                    $order->id_client = $client->first_name . ' ' . $client->last_name;
+                }
+            });
+            $users->map(function ($user) use ($order) {
+                if ($order->id_user == $user->id) {
+                    $order->id_user = $user->name;
+                }
+            });
+            $folioTypes->map(function ($folioType) use ($order) {
+                if ($order->folio_status_id == $folioType->id) {
+                    $order->folio_status_id = $folioType->name;
+                }
+            });
+        });
+        return response()->json($orders, 200);
+    }
+
+    /**
+     * Devuelve todas l
+     */
+    public function getQuotes()
     {
         $orders = Order::all();
         return response()->json($orders, 200);

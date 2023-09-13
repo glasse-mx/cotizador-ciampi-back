@@ -35,6 +35,15 @@ return new class extends Migration
             'user_type' => 1,
             'avatar' => 'default.png',
         ]);
+
+        DB::table('users')->insert([
+            'name' => 'Jose Miguel Espinosa',
+            'email' => 'direccion@freddo.com.mx',
+            'phone' => '5512345678',
+            'password' => bcrypt('pass123'),
+            'user_type' => 4,
+            'avatar' => 'default.png',
+        ]);
     }
 
     /**

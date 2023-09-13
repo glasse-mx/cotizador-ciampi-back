@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserType;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'getUserTypes']]);
     }
 
     /**
@@ -109,7 +110,13 @@ class AuthController extends Controller
         ]);
     }
 
-
+    /**
+     * Register a new user
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws ValidationException
+     * 
+     */
     public function register(Request $request)
     {
         try {
@@ -141,5 +148,75 @@ class AuthController extends Controller
                 'errors' => $e->errors()
             ], 422);
         }
+    }
+
+    /**
+     * Get all users
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllUsers()
+    {
+        $users = User::all();
+        return response($users, Response::HTTP_OK);
+    }
+
+    /**
+     * Get a user by id
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     * *
+     */
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+        return response($user, Response::HTTP_OK);
+    }
+
+    /**
+     * Update a user
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function updateUser(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                "password" => "confirmed"
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $user = User::find($id);
+            $user->name = $request->name ? $request->name : $user->name;
+            $user->email = $request->email ? $request->email : $user->email;
+            $user->phone = $request->phone ? $request->phone : $user->phone;
+            $user->password = $request->password != '' ? $request->password : $user->password;
+            $user->user_type = $request->user_type ? $request->user_type : $user->user_type;
+            $user->save();
+
+            return response($user, Response::HTTP_OK);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        }
+    }
+
+
+
+    /**
+     * Return the types of users
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserTypes()
+    {
+        $userTypes = UserType::all();
+        return response($userTypes, Response::HTTP_OK);
     }
 }

@@ -20,12 +20,9 @@ return new class extends Migration
         DB::table('payment_type')->insert([
             ['value' => 'Efectivo: CDMX Sin referencia'],
             ['value' => 'Depósito en Efectivo'],
-            ['value' => 'Cheque Nominativo'],
             ['value' => 'Transferencia Bancaria'],
             ['value' => 'Tarjeta de Crédito'],
             ['value' => 'Tarjeta de Débito'],
-            ['value' => 'Liga de pago c/tarjeta'],
-            ['value' => 'Pago Web'],
             ['value' => 'Paypal'],
             ['value' => 'OpenPay'],
             ['value' => 'Stripe']
