@@ -51,11 +51,13 @@ Route::group([
 
     //Rutas para las operaciones sobre las ordenes
     Route::post('orders', [OrderController::class, 'createOrder']);
+    Route::get('orders/all', [orderController::class, 'getOrders']);
+    Route::get('orders/quotes/{id}', [orderController::class, 'getOrder']);
     Route::put('orders/{id}', [OrderController::class, 'convertToNotaVenta']);
     Route::put('orders/{id}/cancel', [OrderController::class, 'convertToNotaCancelada']);
-    Route::get('orders/all', [orderController::class, 'getOrders']);
     Route::get('orders/quotes', [orderController::class, 'getOrders']);
     Route::get('orders/sales', [orderController::class, 'getSales']);
+    Route::get('orders/cancelations', [orderController::class, 'getCancellations']);
 });
 
 // Ruta Para obtener las opciones de pago y bancos

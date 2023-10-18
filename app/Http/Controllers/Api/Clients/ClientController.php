@@ -50,7 +50,8 @@ class ClientController extends Controller
             $client->save();
 
             return response()->json([
-                "Message" => "Cliente Agregado con exito!"
+                "Message" => "Cliente Agregado con exito!",
+                "id" => $client->id
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -125,7 +126,8 @@ class ClientController extends Controller
             $client->save();
 
             return response()->json([
-                "Message" => "Usuario Editado con Exito!"
+                "Message" => "Usuario Editado con Exito!",
+                "id" => $client->id
             ]);
         } catch (ValidationException $e) {
             return response()->json([

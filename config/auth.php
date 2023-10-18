@@ -70,6 +70,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
+        'jwt' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'expire' => 1440, // Duración de 1 día en minutos
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
