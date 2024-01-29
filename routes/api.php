@@ -31,6 +31,11 @@ Route::group([
 ], function ($router) {
 
     /**
+     * Dashboard
+     */
+    Route::get('sumary', [OrderController::class, 'getSalesSummary']);
+
+    /**
      * Rutas para la gestion de Usuarios de la app
      */
     Route::post('register', [AuthController::class, 'register']);
@@ -48,16 +53,19 @@ Route::group([
     Route::get('client/{telefono}', [ClientController::class, 'getClient']);
     Route::put('client/{telefono}', [ClientController::class, 'editClient']);
     Route::delete('client/{telefono}', [ClientController::class, 'deleteClient']);
+    Route::get('client/{telefono}/orders', [OrderController::class, 'getOrdersByClient']);
+    Route::get('clients/search={search}', [ClientController::class, 'searchClient']);
 
     //Rutas para las operaciones sobre las ordenes
-    Route::post('orders', [OrderController::class, 'createOrder']);
-    Route::get('orders/all', [orderController::class, 'getOrders']);
-    Route::get('orders/quotes/{id}', [orderController::class, 'getOrder']);
-    Route::put('orders/{id}', [OrderController::class, 'convertToNotaVenta']);
-    Route::put('orders/{id}/cancel', [OrderController::class, 'convertToNotaCancelada']);
-    Route::get('orders/quotes', [orderController::class, 'getOrders']);
-    Route::get('orders/sales', [orderController::class, 'getSales']);
-    Route::get('orders/cancelations', [orderController::class, 'getCancellations']);
+    Route::post('orders', [OrderController::class, 'createOrder']); // Crea un Folio como cotizacion
+    Route::get('orders/quotes', [orderController::class, 'getOrders']); // Obtiene todas las cotizaciones
+    Route::get('orders/sales', [orderController::class, 'getSales']); // Obtiene todas las ventas
+    Route::get('orders/cancelations', [orderController::class, 'getCancellations']); // Obtiene todas las Notas canceladas
+    Route::get('orders/quotes/{id}', [orderController::class, 'getOrder']); // Obtiene un folio segun su id
+    Route::put('orders/edit/{id}', [OrderController::class, 'editOrder']); // Modifica un Folio
+    Route::put('orders/{id}', [OrderController::class, 'convertToNotaVenta']); // Convierte una cotizacion en una nota de venta
+    Route::put('orders/{id}/cancel', [OrderController::class, 'convertToNotaCancelada']); // Cancela un folio
+    Route::put('orders/{id}/approval', [OrderController::class, 'setOrderApproval']); // Aprueba un folio
 });
 
 // Ruta Para obtener las opciones de pago y bancos

@@ -50,9 +50,18 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
+            $user = auth()->user();
+
+            // Verificar si el usuario está activo
+            if (!$user->activo) {
+                return response()->json(['error' => 'Unauthorized: User is not active'], 401);
+            }
+
+            $user->user_type = UserType::find($user->user_type);
+
             return $this->respondWithToken([
                 'token' => $token,
-                'user' => auth()->user()
+                'user' => $user
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -218,5 +227,17 @@ class AuthController extends Controller
     {
         $userTypes = UserType::all();
         return response($userTypes, Response::HTTP_OK);
+    }
+
+    /**
+     * Desactiva a un usuario
+     */
+
+    public function disableUser($id)
+    {
+        $user = User::find($id);
+        $user->activo = 0;
+        $user->save();
+        return response($user, Response::HTTP_OK);
     }
 }

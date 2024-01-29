@@ -14,6 +14,7 @@ use App\Models\PaymentType;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -26,7 +27,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Crea una Nueva cotizacion
+     * Crea un Folio Nuevo como Cotizacion
      */
     public function createOrder(Request $request)
     {
@@ -60,6 +61,7 @@ class OrderController extends Controller
             $order->detalle_anticipo = json_encode($request->detalles_anticipo);
             $order->detalles_pago = json_encode($request->detalles_pago);
             $order->observaciones = $request->observaciones;
+            $order->detalles_envio = json_encode($request->detalles_envio);
             $order->salida = $request->salida;
             $order->llegada = $request->llegada;
             $order->total = $request->total;
@@ -76,50 +78,29 @@ class OrderController extends Controller
     }
 
     /**
-     * Crea una Nueva Nota de Venta
+     * Edita un Folio existente como Cotizacion
      */
-    public function createNotaVenta(Request $request)
+    public function editOrder($id, Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'pdv' => 'string',
-                // 'productos' => 'json',
-                // 'descuentos' => 'json',
-                // 'detalles_anticipo' => 'json',
-                // 'detalles_pago' => 'json'
-            ]);
+        $order = Order::find($id);
 
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
+        $order->edited_by = $request->edited_by;
+        $order->id_cliente = $request->id_cliente;
+        $order->productos = json_encode($request->productos);
+        $order->descuentos = json_encode($request->descuentos);
+        $order->folio_status_id = 1;
+        $order->subtotal_productos = json_encode($request->subtotal_productos);
+        $order->subtotal_promos = $request->subtotal_promos;
+        $order->detalle_anticipo = json_encode($request->detalles_anticipo);
+        $order->detalles_pago = json_encode($request->detalles_pago);
+        $order->observaciones = $request->observaciones;
+        $order->detalles_envio = json_encode($request->detalles_envio);
+        $order->salida = $request->salida;
+        $order->llegada = $request->llegada;
+        $order->total = $request->total;
+        $order->save();
 
-            $folio = new FolioNotaVenta();
-            $folio->save();
-
-            $order = new Order();
-            // $order->id_user = auth()->user()->id;
-            $order->id_user = $request->id_user;
-            $order->pdv = $request->pdv;
-            $order->id_client = $request->id_client;
-            $order->productos = json_encode($request->productos);
-            $order->descuentos = json_encode($request->descuentos);
-            $order->folio_status_id = 2;
-            $order->folio_nota_venta_id = $folio->id;
-            $order->subtotal_productos = json_encode($request->subtotal_productos);
-            $order->subtotal_promos = $request->subtotal_promos;
-            $order->detalle_anticipo = json_encode($request->detalle_anticipo);
-            $order->detalles_pago = json_encode($request->detalles_pago);
-            $order->total = $request->total;
-            $order->save();
-
-            return response()->json($order, 201);
-        } catch (ValidationException $e) {
-
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $e->errors()
-            ], 422);
-        }
+        return response()->json($order, 201);
     }
 
     /**
@@ -197,7 +178,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Convierte una Cotizacion en una Nota Cancelada
+     * Convierte una Cotizacion/N. Venta en una Nota Cancelada
      */
     public function convertToNotaCancelada($id)
     {
@@ -214,13 +195,21 @@ class OrderController extends Controller
     /**
      * Devuelve todas las cotizaciones
      */
-    public function getOrders()
+    public function getOrders(Request $request)
     {
-        $orders = Order::where('folio_status_id', 1)->get();
+
+        $user = User::find($request->user_id);
+
+        // return response()->json($user, 200);
+
+        $orders = $user->user_type === 1
+            ? Order::where('folio_status_id', 1)->where('created_by', $user->id)->get()
+            : Order::where('folio_status_id', 1)->get();
+
 
         foreach ($orders as $order) {
 
-            $user = User::find($order->created_by);
+            $seller = User::find($order->created_by);
             $client = Client::where('id', $order->id_cliente)
                 ->orWhere('phone', $order->id_cliente)
                 ->first();
@@ -240,7 +229,7 @@ class OrderController extends Controller
             $pagos = $order->detalles_pago ? json_decode($order->detalles_pago) : null;
 
             $order->fecha = $fecha;
-            $order->created_by = $user;
+            $order->created_by = $seller;
             $order->id_cliente = $client;
             $order->productos = $productos;
             $order->descuentos = $promos;
@@ -254,13 +243,18 @@ class OrderController extends Controller
     /**
      * Devuelve todas las Notas de Venta
      */
-    public function getSales()
+    public function getSales(Request $request)
     {
-        $orders = Order::where('folio_status_id', 2)->get();
+
+        $user = User::find($request->user_id);
+
+        $orders = $user->user_type === 1
+            ? Order::where('folio_status_id', 2)->where('created_by', $user->id)->get()
+            : Order::where('folio_status_id', 2)->get();
+
 
         foreach ($orders as $order) {
 
-            $user = User::find($order->created_by);
             $client = Client::where('id', $order->id_cliente)
                 ->orWhere('phone', $order->id_cliente)
                 ->first();
@@ -270,9 +264,10 @@ class OrderController extends Controller
             $promos = $order->descuentos ? json_decode($order->descuentos) : null;
             $anticipos = $order->detalle_anticipo ? json_decode($order->detalle_anticipo) : null;
             $pagos = $order->detalles_pago ? json_decode($order->detalles_pago) : null;
+            $created_by = User::find($order->created_by);
 
             $order->fecha = $fecha;
-            $order->created_by = $user;
+            $order->created_by = $created_by;
             $order->id_cliente = $client;
             $order->productos = $productos;
             $order->descuentos = $promos;
@@ -359,27 +354,17 @@ class OrderController extends Controller
         $promos = $order->descuentos ? json_decode($order->descuentos) : null;
         $anticipos = $order->detalle_anticipo ? json_decode($order->detalle_anticipo) : null;
         $pagos = $order->detalles_pago ? json_decode($order->detalles_pago) : null;
-
-        // Agregamos los bancos y los tipos de pagos a los detalles de pago y anticipo
-        if ($anticipos != null) {
-            foreach ($anticipos as $anticipo) {
-                $banco = $anticipo->bank > 0  ? Banks::find($anticipo->bank) : null;
-                $anticipo->bank = $banco != null ? $banco->bank : null;
-                $tipoDePago = PaymentType::find($anticipo->paymentType);
-                $anticipo->paymentType = $tipoDePago->value;
-            }
-        }
-
-        if ($pagos != null) {
-            foreach ($pagos as $pago) {
-                $banco = $pago->bank > 0  ? Banks::find($pago->bank) : null;
-                $pago->bank = $banco != null ? $banco->bank : null;
-                $tipoDePago = PaymentType::find($pago->paymentType);
-                $pago->paymentType = $tipoDePago->value;
-            }
-        }
+        $detallesEnvio = $order->detalles_envio ? json_decode($order->detalles_envio) : null;
 
         // Convertimos la fecha en un formato mas legible
+        if ($order->folio_status_id === 2) {
+            $notaVenta = FolioNotaVenta::find($order->folio_nota_venta_id);
+            $fecha = Carbon::parse($notaVenta->created_at)->format('d/m/Y - H:i');
+        } else {
+            $cotizacion = FolioCotizaciones::find($order->folio_cotizacion_id);
+            $fecha = Carbon::parse($cotizacion->created_at)->format('d/m/Y - H:i');
+        }
+
         $fecha = Carbon::parse($order->created_at)->format('d/m/Y - H:i');
 
         // Guarda los datos en la salida
@@ -391,6 +376,7 @@ class OrderController extends Controller
         $order->detalles_pago = $pagos;
         $order->productos = $productos;
         $order->descuentos = $promos;
+        $order->detalles_envio = $detallesEnvio;
 
 
         return response()->json($order, 200);
@@ -402,11 +388,13 @@ class OrderController extends Controller
      */
     public function getOrdersByClient($id)
     {
-        $orders = Order::where('id_client', $id)->get();
+        $orders = Order::where('id_cliente', $id)->paginate(10);
 
         foreach ($orders as $order) {
 
+            // Ubicamos los datos de cliente y usuario
             $user = User::find($order->created_by);
+            $edited = User::find($order->edited_by);
             $client = Client::where('id', $order->id_cliente)
                 ->orWhere('phone', $order->id_cliente)
                 ->first();
@@ -417,13 +405,18 @@ class OrderController extends Controller
             $anticipos = $order->detalle_anticipo ? json_decode($order->detalle_anticipo) : null;
             $pagos = $order->detalles_pago ? json_decode($order->detalles_pago) : null;
 
+            $folioType = FolioType::find($order->folio_status_id);
+
+
             $order->fecha = $fecha;
             $order->created_by = $user;
             $order->id_cliente = $client;
+            $order->edited_by = $edited;
             $order->productos = $productos;
             $order->descuentos = $promos;
             $order->detalle_anticipo = $anticipos;
             $order->detalles_pago = $pagos;
+            $order->folio_status_id = $folioType->name;
         }
 
         return response()->json($orders, 200);
@@ -459,5 +452,164 @@ class OrderController extends Controller
         }
 
         return response()->json($orders, 200);
+    }
+
+    /**
+     * Cambia el estado de aprobacion de una orden
+     */
+
+    public function setOrderApproval($id, Request $request)
+    {
+
+        if ($id == null) {
+            return response()->json([
+                'message' => 'No se encontro la cotizacion'
+            ], 404);
+        } else {
+            $order = Order::find($id);
+        }
+
+        if (!$request->user_id) {
+            return response()->json([
+                'message' => 'No se Suministro un usuario valido'
+            ], 404);
+        } else {
+            $user = User::find($request->user_id);
+        }
+
+        switch ($user->user_type) {
+            case 2:
+                $order->pdv_approval = true;
+                $order->save();
+                break;
+            case 3:
+                $order->assistant_approval = true;
+                $order->save();
+                break;
+            case 4:
+                $order->head_approval = true;
+                $order->save();
+                break;
+            case 5:
+                $order->ceo_approval = true;
+                $order->save();
+                break;
+            default:
+                return response()->json([
+                    'message' => 'No tienes permisos para realizar esta accion'
+                ], 401);
+                break;
+        }
+
+        return response()->json($order, 200);
+    }
+
+    /**
+     * Obtiene el resumen del mes actual de las ventas
+     */
+    public function getSalesSummary()
+    {
+
+        // Se obtiene el mes actual y la cantidad de semanas que tiene
+        $firstDayOfMonth = Carbon::now()->startOfMonth();
+        $lastDayOfMonth = Carbon::now()->endOfMonth();
+        $weeksInMonth = $firstDayOfMonth->diffInWeeks($lastDayOfMonth) + 1;
+
+        // Se obtienen las cotizaciones
+        $invoices = Order::where('folio_status_id', 1)->whereBetween(
+            'created_at',
+            [$firstDayOfMonth, $lastDayOfMonth]
+        )->get();
+
+        // Se obtienen todas las notas de venta
+        $sales = Order::where('folio_status_id', 2)->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])->get();
+
+        // Se Obtienen a los vendedores
+        $sellers = User::whereIn('user_type', [1, 2])->where('activo', 1)->get();
+
+        // Se declaran las variables estaticas para el resumen
+        $totalMXN = 0;
+        $maquinas = 0;
+        $reguladores = 0;
+        $insumos = 0;
+        $anticipos = 0;
+        $agentes = [];
+        $semanas = array_map(function ($numero) {
+            return 'semana-' . $numero;
+        }, range(1, $weeksInMonth));
+
+        // Se declaran las variables dinamicas para el resumen
+        foreach ($sellers as $seller) {
+            // $agentes[$seller->id] = array_merge(['vendedor' => $seller->name], array_fill(0, $weeksInMonth, 0), ['anticipos' => 0]);
+            $agentes[$seller->id] = array_merge(['vendedor' => $seller->name], array_fill_keys($semanas, 0), ['anticipos' => 0]);
+        }
+
+        // Se obtienen los anticipos pagos
+        foreach ($invoices as $invoice) {
+            $detalles = json_decode($invoice->detalle_anticipo) ? json_decode($invoice->detalle_anticipo) : null;
+            $prods = json_decode($invoice->productos) ? json_decode($invoice->productos) : null;
+            $hayMaquina = false;
+            $vendedor = $invoice->created_by;
+
+            foreach ($prods as $prod) {
+                if ($prod->categories == 'maquinas') {
+                    $hayMaquina = true;
+                    break;
+                }
+            }
+
+            if ($hayMaquina && $detalles != null) {
+                $agentes[$vendedor]['anticipos'] += 1;
+                $anticipos += 1;
+            }
+        }
+
+        foreach ($sales as $order) {
+            $totalMXN += $order->total;
+            $prods = json_decode($order->productos) ? json_decode($order->productos) : null;
+            $folio = FolioNotaVenta::find($order->folio_nota_venta_id);
+
+            $weekOfOrder = $firstDayOfMonth->diffInWeeks(Carbon::parse($folio->created_at)) + 1;
+
+            foreach ($prods as $prod) {
+                if (isset($prod->categories) && $prod->categories == 'maquinas') {
+                    $maquinas += 1;
+                    $agentes[$order->created_by]['semana-' . $weekOfOrder] += 1;
+                } elseif (isset($prod->categories) && $prod->categories == 'reguladores') {
+                    $reguladores += 1;
+                } elseif (isset($prod->categories) && $prod->categories == 'insumos') {
+                    $insumos += 1;
+                }
+            }
+        }
+
+        $summary = [
+            'semanas' => $weeksInMonth,
+            'total' => $totalMXN,
+            'anticipos' => $anticipos,
+            'maquinas' => $maquinas,
+            'reguladores' => $reguladores,
+            'insumos' => $insumos,
+            'ventas' => $sales->count(),
+            'agentes' => $agentes
+        ];
+
+        return response()->json($summary, 200);
+    }
+
+    function getOrdersGroupedByWeek()
+    {
+        // Obtener la fecha de inicio del mes actual
+        $startOfMonth = now()->startOfMonth()->toDateString();
+        // Obtener la fecha de fin del mes actual
+        $endOfMonth = now()->endOfMonth()->toDateString();
+
+        // Consulta para obtener los registros del presente mes, separados en semanas
+        $ordersByWeek = Order::select(DB::raw('WEEK(created_at) as week_number'), DB::raw('YEAR(created_at) as year'))
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->groupBy('year', 'week_number')
+            ->get();
+
+        return response()->json($ordersByWeek, 200);
     }
 }

@@ -73,7 +73,7 @@ return [
         'jwt' => [
             'driver' => 'jwt',
             'provider' => 'users',
-            'expire' => 1440, // Duración de 1 día en minutos
+            'expire' => 43200, // Duración de 1 día en minutos
         ],
 
         // 'users' => [
@@ -105,8 +105,8 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_reset_tokens',
-            'expire' => 1440,
-            'throttle' => 1440,
+            'expire' => 43200,
+            'throttle' => 43200,
         ],
     ],
 
