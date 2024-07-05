@@ -1,21 +1,37 @@
-# CIAMPI - COTIZACIONES - BACKEND
 
-Esta app basada en Laravel 10, se centra en ofrecer una gestion de las notas de venta y cotizaciones de la empresa, esta parte solo contempla el backend, usa rutas en API REST para ofrecer los servicios.
+# Cotizador BackEnd -Laravel
 
-El inventario se almacena en una base de datos externa (Woocommerce), es por ello que la mejor alternativa es crear esta app solo para manejar las notas y cotizaciones, mientras que una app de front end combina ambos servicios
+Este proyecto contiene el codigo fuente para el sistema cotizador que se usa en las tres empresas, es importante revisar esta documentacion antes de hacer algun cambio, y recuerda que si has hecho alguna contrubucion, documentarla.
 
-## DEPENDENCIAS
+## Dependencias
+
+Este proyecto esta escrito en laravel 10, y usa JWT para poder validar las peticiones via API REST.
+
+## Estructura
+Este sistema solo presta servicios via API rest a traves de sus controladores, revisar el archivo de routes para identificar las funciones y controladores involucrados.
+
+## Capacidades
+
+El sistema tiene las operaciones CRUD basicas para poder
 
 <ul>
-    <li>PHP 8.2 o mayor</li>
-    <li>Composer</li>
-    <li>MySQL 5.6 o mayor</li>
+    <li>Crear, editar, ver y buscar Clientes</li>
+    <li>Crear, editar, actualizar, y cancelar Ordenes (notas de venta o cotizaciones)</li>
 </ul>
 
-## INSTALACION
+### Instalacion
 
 <ul>
-    <li>Clonar este repositorio</li>
-    <li>Instalar las dependencias de composer con el comando "composer install"</li>
-    <li>Correr con "php artisan serve"</li>
+    <li>Antes de subir a un entorno de produccion, se recomienda probar extensamente, clonar este repositorio</li>
+    <li>Usar el comando -composer install- para actualizar el arbol de dependencias</li>
+    <li>Usar el comando -php artisan migrate- para crear y migrar la base de datos.</li>
+    <li>Usar el comando -php artisan serve- para inicializar el servidor local</li>
+    <li>Usar postman o un cliente de API's para testear las operaciones y rutas del archivo route.php</li>
 </ul>
+
+
+
+
+
+
+
